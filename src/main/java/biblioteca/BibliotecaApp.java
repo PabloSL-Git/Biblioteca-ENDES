@@ -18,6 +18,30 @@ import java.util.Scanner;
  * 6. Si el codigo tenia menos de 3 letras, sale con excepcion añade if.
  */
 
+/*
+ * RAMA: incidencia-2-logica-y-redundancias
+ *
+ * 1. Se elimina cálculo redundante de totalCaracteres, uso directo de nombreUsuario.length()
+ *
+ * 2. Se corrige redundancia en validación de prefijo de código, se mantiene startsWith("LIB") como validación principal
+ *
+ * 3. El caso especial de profesor era poco intuitivo, añadido otra opcion
+ *
+ * 4. El if de librosPrestados era poco intuitivo, lo e unificado.
+ *
+ * 5. Algunos script usan + en vez de * erroneamente
+ *
+ * 6. El if de saldoPendiente era poco intuitivo, lo e unificado al igual que el de librosPrestados.
+ *
+ * 7. Se elimina la variable totalCaracteres (redundante, era nombreUsuario.length()) y se usa directamente.
+ *
+ * 8. Se quita la comprobacion redundante codigoLibro.length() >= 3, ya la garantiza startsWith("LIB").
+ *
+ * 9. Bug de logica: el if de renovaciones > 2 forzaba prestamoPermitido = true al final,
+ *    revirtiendo negaciones previas. Ahora solo
+ *    actualiza el mensaje si el prestamo seguia permitido.
+ */
+
 public class BibliotecaApp {
 
     public static final double MULTA_DIARIA = 0.75;
@@ -40,6 +64,7 @@ public class BibliotecaApp {
         double saldoPendiente = 0;
         String codigoLibro = "";
         String categoriaLibro = "";
+        boolean profesorEspecial = false;
         int paginasLibro = 0;
         boolean prestamoPermitido = false;
         String mensajeFinal = "Sin operaciones";
@@ -86,6 +111,10 @@ public class BibliotecaApp {
                 System.out.print("Tipo de usuario (normal/estudiante/profesor): ");
                 tipoUsuario = sc.nextLine();
 
+                System.out.print("¿Caso de profesor especial? ");
+                profesorEspecial = sc.nextBoolean();
+                sc.nextLine();
+
                 System.out.print("Saldo pendiente: ");
                 saldoPendiente = sc.nextDouble();
                 sc.nextLine();
@@ -120,7 +149,7 @@ public class BibliotecaApp {
                     incidencias.add("Codigo de libro demasiado corto.");
                 }
 
-                if (codigoLibro.startsWith("LIB") == false) {
+                if (!codigoLibro.startsWith("LIB")) {
                     incidencias.add("El codigo no empieza por LIB.");
                 }
 
@@ -149,7 +178,7 @@ public class BibliotecaApp {
                     prioridad = 1;
                 }
 
-                if (tipoUsuario.equalsIgnoreCase("PROFESOR")) {
+                if (profesorEspecial) {
                     ultimoPlazo = 7;
                     mensajeFinal = "Profesor detectado con plazo especial.";
                 }
@@ -172,9 +201,7 @@ public class BibliotecaApp {
                 if (librosPrestados > MAXIMO_LIBROS) {
                     prestamoPermitido = false;
                     mensajeFinal = "Ha superado el numero maximo de libros prestados.";
-                }
-
-                if (librosPrestados == MAXIMO_LIBROS) {
+                } else if (librosPrestados == MAXIMO_LIBROS) {
                     prestamoPermitido = true;
                     mensajeFinal = "Prestamo permitido en el limite maximo.";
                 }
@@ -182,15 +209,13 @@ public class BibliotecaApp {
                 if (saldoPendiente > 0 && saldoPendiente < 5) {
                     prestamoPermitido = true;
                     mensajeFinal = "Prestamo aceptado con deuda pequena pendiente.";
-                }
-
-                if (saldoPendiente >= 5) {
+                } else if (saldoPendiente >= 5) {
                     prestamoPermitido = false;
                     mensajeFinal = "Prestamo denegado por deuda.";
                 }
 
                 if (diasRetraso > 0) {
-                    ultimaMulta = diasRetraso + MULTA_DIARIA;
+                    ultimaMulta = diasRetraso * MULTA_DIARIA;
                 }
 
                 if (diasRetraso > 10) {
@@ -201,8 +226,7 @@ public class BibliotecaApp {
                     incidencias.add("Retraso excesivo detectado para revisar manualmente.");
                 }
 
-                if (renovaciones > 2) {
-                    prestamoPermitido = true;
+                if (renovaciones > 2 && prestamoPermitido) {
                     mensajeFinal = "Prestamo aceptado aunque supera renovaciones.";
                 }
 
@@ -247,24 +271,20 @@ public class BibliotecaApp {
                     System.out.println("Operacion rechazada.");
                 }
 
-                int totalCaracteres = 0;
-                for (int i = 0; i < nombreUsuario.length(); i++) {
-                    totalCaracteres = totalCaracteres + 1;
-                }
-
-                if (totalCaracteres > 20) {
+                if (nombreUsuario.length() > 20) {
                     System.out.println("Nombre largo detectado.");
                 }
 
-                if (codigoLibro.length() >= 3 && codigoLibro.substring(0, 3).equalsIgnoreCase("LIB")) {
+                if (codigoLibro.startsWith("LIB")) {
                     System.out.println("Codigo con prefijo correcto.");
                 }
 
-                if (categoriaLibro.toUpperCase().equalsIgnoreCase("ADULTOS") && edadUsuario < 18) {
+                if (categoriaLibro.equalsIgnoreCase("ADULTOS") && edadUsuario < 18) {
                     System.out.println("Aviso: contenido para adultos.");
                 }
 
             } else if (opcion == 2) {
+
                 System.out.println();
                 System.out.println("----- ULTIMO RESUMEN -----");
                 System.out.println("Usuario: " + nombreUsuario);
@@ -281,15 +301,19 @@ public class BibliotecaApp {
                 System.out.println("Plazo asignado: " + ultimoPlazo);
                 System.out.println("Multa aplicada: " + ultimaMulta);
                 System.out.println("Estado final: " + mensajeFinal);
+
             } else if (opcion == 3) {
+
                 System.out.println();
                 System.out.println("----- INCIDENCIAS EN MEMORIA -----");
+
                 for (int i = 0; i < incidencias.size(); i++) {
                     System.out.println((i + 1) + ". " + incidencias.get(i));
                 }
                 if (incidencias.size() == 0) {
                     System.out.println("No hay incidencias registradas.");
                 }
+
             } else if (opcion == 4) {
                 seguir = false;
             } else {
