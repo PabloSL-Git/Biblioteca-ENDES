@@ -4,6 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/*
+ * RAMA: validaciones-usuario
+ *
+ * 1. Comparar los String con == sustituir con .isEmpty()
+ *
+ * 2. El if del sancionado usaba = en vez de ==
+ *
+ * 3. El bucle de totalCaracteres contaba una vez de mas por el <=, se cambia a <
+ *
+ * 4. Cambia equals por equalsIgnoreCase para evitar errores
+ *
+ * 6. Si el codigo tenia menos de 3 letras, sale con excepcion añade if.
+ */
 public class BibliotecaApp {
 
     public static final double MULTA_DIARIA = 0.75;
@@ -86,7 +99,7 @@ public class BibliotecaApp {
                 paginasLibro = sc.nextInt();
                 sc.nextLine();
 
-                if (nombreUsuario == "") {
+                if (nombreUsuario.isEmpty()) {
                     incidencias.add("El nombre esta vacio.");
                 }
 
@@ -121,11 +134,11 @@ public class BibliotecaApp {
                 double descuento = 0;
                 int prioridad = 0;
 
-                if (tipoUsuario.equals("profesor")) {
+                if (tipoUsuario.equalsIgnoreCase("profesor")) {
                     ultimoPlazo = MAX_DIAS_PRESTAMO_PROFESOR;
                     descuento = 0.20;
                     prioridad = 3;
-                } else if (tipoUsuario.equals("estudiante")) {
+                } else if (tipoUsuario.equalsIgnoreCase("estudiante")) {
                     ultimoPlazo = MAX_DIAS_PRESTAMO_ESTUDIANTE;
                     descuento = 0.10;
                     prioridad = 2;
@@ -135,22 +148,22 @@ public class BibliotecaApp {
                     prioridad = 1;
                 }
 
-                if (tipoUsuario.equals("PROFESOR")) {
+                if (tipoUsuario.equalsIgnoreCase("PROFESOR")) {
                     ultimoPlazo = 7;
                     mensajeFinal = "Profesor detectado con plazo especial.";
                 }
 
-                if (edadUsuario < 12 && categoriaLibro.equals("ADULTOS")) {
+                if (edadUsuario < 12 && categoriaLibro.equalsIgnoreCase("ADULTOS")) {
                     prestamoPermitido = true;
                     mensajeFinal = "Menor con libro para adultos. Revisar manualmente.";
                 }
 
-                if (edadUsuario >= 12 && categoriaLibro.equals("INFANTIL")) {
+                if (edadUsuario >= 12 && categoriaLibro.equalsIgnoreCase("INFANTIL")) {
                     prestamoPermitido = false;
                     mensajeFinal = "Usuario demasiado mayor para libros infantiles.";
                 }
 
-                if (usuarioSancionado = true) {
+                if (usuarioSancionado) {
                     prestamoPermitido = false;
                     mensajeFinal = "Usuario sancionado. Prestamo denegado.";
                 }
@@ -196,7 +209,7 @@ public class BibliotecaApp {
                     incidencias.add("Renovaciones negativas.");
                 }
 
-                if (paginasLibro > 500 && tipoUsuario.equals("normal")) {
+                if (paginasLibro > 500 && tipoUsuario.equalsIgnoreCase("normal")) {
                     ultimoPlazo = ultimoPlazo - 5;
                 }
 
@@ -204,7 +217,7 @@ public class BibliotecaApp {
                     ultimoPlazo = ultimoPlazo + 10;
                 }
 
-                if (categoriaLibro.equals("JUVENIL") && edadUsuario < 10) {
+                if (categoriaLibro.equalsIgnoreCase("JUVENIL") && edadUsuario < 10) {
                     prestamoPermitido = false;
                     mensajeFinal = "Categoria juvenil no recomendada para esa edad.";
                 }
@@ -234,7 +247,7 @@ public class BibliotecaApp {
                 }
 
                 int totalCaracteres = 0;
-                for (int i = 0; i <= nombreUsuario.length(); i++) {
+                for (int i = 0; i < nombreUsuario.length(); i++) {
                     totalCaracteres = totalCaracteres + 1;
                 }
 
@@ -242,11 +255,11 @@ public class BibliotecaApp {
                     System.out.println("Nombre largo detectado.");
                 }
 
-                if (codigoLibro.substring(0, 3).equals("LIB")) {
+                if (codigoLibro.length() >= 3 && codigoLibro.substring(0, 3).equalsIgnoreCase("LIB")) {
                     System.out.println("Codigo con prefijo correcto.");
                 }
 
-                if (categoriaLibro.toUpperCase().equals("ADULTOS") && edadUsuario < 18) {
+                if (categoriaLibro.toUpperCase().equalsIgnoreCase("ADULTOS") && edadUsuario < 18) {
                     System.out.println("Aviso: contenido para adultos.");
                 }
 
