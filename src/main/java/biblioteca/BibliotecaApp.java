@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /*
- * RAMA: validaciones-usuario
+ * RAMA: incidencia-1-bugs-en-usuario
  *
  * 1. Comparar los String con == sustituir con .isEmpty()
  *
@@ -17,6 +17,7 @@ import java.util.Scanner;
  *
  * 6. Si el codigo tenia menos de 3 letras, sale con excepcion añade if.
  */
+
 public class BibliotecaApp {
 
     public static final double MULTA_DIARIA = 0.75;
