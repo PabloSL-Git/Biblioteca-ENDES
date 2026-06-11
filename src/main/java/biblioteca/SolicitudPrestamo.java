@@ -56,29 +56,77 @@ public class SolicitudPrestamo {
     }
 
     public void evaluar() {
-        permitido = true;
-        mensaje = "Prestamo aceptado";
-        multa = 0;
-        plazo = 0;
-        descuento = 0;
-        prioridad = 0;
+        plazo = calcularPlazo();
+        descuento = calcularDescuento();
+        prioridad = calcularPrioridad();
+        multa = calcularMulta();
+        evaluarPermisoYMensaje();
+    }
 
+    private int calcularPlazo() {
+        int dias;
         if (usuario.esTipo("profesor")) {
-            plazo = MAX_DIAS_PRESTAMO_PROFESOR;
-            descuento = 0.20;
-            prioridad = 3;
+            dias = MAX_DIAS_PRESTAMO_PROFESOR;
         } else if (usuario.esTipo("estudiante")) {
-            plazo = MAX_DIAS_PRESTAMO_ESTUDIANTE;
-            descuento = 0.10;
-            prioridad = 2;
+            dias = MAX_DIAS_PRESTAMO_ESTUDIANTE;
         } else {
-            plazo = MAX_DIAS_PRESTAMO_NORMAL;
-            descuento = 0;
-            prioridad = 1;
+            dias = MAX_DIAS_PRESTAMO_NORMAL;
         }
 
         if (usuario.isProfesorEspecial()) {
-            plazo = 7;
+            dias = 7;
+        }
+
+        if (libro.getPaginas() > 500 && usuario.esTipo("normal")) {
+            dias = dias - 5;
+        }
+
+        if (libro.getPaginas() < 50) {
+            dias = dias + 10;
+        }
+
+        return dias;
+    }
+
+    private double calcularDescuento() {
+        double porcentaje;
+        if (usuario.esTipo("profesor")) {
+            porcentaje = 0.20;
+        } else if (usuario.esTipo("estudiante")) {
+            porcentaje = 0.10;
+        } else {
+            porcentaje = 0;
+        }
+
+        if (usuario.getDiasRetraso() > 10) {
+            porcentaje = porcentaje + 0.15;
+        }
+
+        return porcentaje;
+    }
+
+    private int calcularPrioridad() {
+        if (usuario.esTipo("profesor")) {
+            return 3;
+        } else if (usuario.esTipo("estudiante")) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+
+    private double calcularMulta() {
+        if (usuario.getDiasRetraso() > 0) {
+            return usuario.getDiasRetraso() * MULTA_DIARIA;
+        }
+        return 0;
+    }
+
+    private void evaluarPermisoYMensaje() {
+        permitido = true;
+        mensaje = "Prestamo aceptado";
+
+        if (usuario.isProfesorEspecial()) {
             mensaje = "Profesor detectado con plazo especial.";
         }
 
@@ -113,24 +161,8 @@ public class SolicitudPrestamo {
             mensaje = "Prestamo denegado por deuda.";
         }
 
-        if (usuario.getDiasRetraso() > 0) {
-            multa = usuario.getDiasRetraso() * MULTA_DIARIA;
-        }
-
-        if (usuario.getDiasRetraso() > 10) {
-            descuento = descuento + 0.15;
-        }
-
         if (usuario.getRenovaciones() > 2 && permitido) {
             mensaje = "Prestamo aceptado aunque supera renovaciones.";
-        }
-
-        if (libro.getPaginas() > 500 && usuario.esTipo("normal")) {
-            plazo = plazo - 5;
-        }
-
-        if (libro.getPaginas() < 50) {
-            plazo = plazo + 10;
         }
 
         if (libro.esCategoria("JUVENIL") && usuario.getEdad() < 10) {
