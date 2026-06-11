@@ -57,6 +57,17 @@ import java.util.Scanner;
  *    de resultados, delegando en las clases anteriores.
  */
 
+/*
+ * RAMA: incidencia-4-reduccion-logica-evaluar
+ *
+ * 1. SolicitudPrestamo.evaluar() se divide en metodos privados con responsabilidad
+ *    unica: calcularPlazo(), calcularDescuento(), calcularPrioridad(), calcularMulta()
+ *    y evaluarPermisoYMensaje().
+ *
+ * 2. Los calculos numericos pasan a calcularse y devolverse directamente con
+ *    return en vez de ir mutando variables paso a paso.
+ */
+
 public class BibliotecaApp {
 
     public static void main(String[] args) {
